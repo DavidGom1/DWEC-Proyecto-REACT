@@ -28,21 +28,21 @@ app.get('/api/ejemplo', async (req, res) => {
   try {
     // Hacer petición a API externa (JSONPlaceholder como ejemplo)
     const response = await fetch('https://jsonplaceholder.typicode.com/posts/1');
-    
+
     // Verificar si la respuesta es correcta
     if (!response.ok) {
       throw new Error(`Error en la API externa: ${response.status}`);
     }
-    
+
     // Convertir respuesta a JSON
     const data = await response.json();
-    
+
     // Devolver los datos al cliente
     res.json({
       success: true,
       data: data
     });
-    
+
   } catch (error) {
     console.error('Error al consultar la API:', error.message);
     res.status(500).json({
@@ -57,19 +57,19 @@ app.get('/api/ejemplo', async (req, res) => {
 app.get('/api/usuarios', async (req, res) => {
   try {
     const response = await fetch('https://jsonplaceholder.typicode.com/users');
-    
+
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
-    
+
     const usuarios = await response.json();
-    
+
     res.json({
       success: true,
       total: usuarios.length,
       data: usuarios
     });
-    
+
   } catch (error) {
     console.error('Error:', error.message);
     res.status(500).json({
@@ -83,20 +83,20 @@ app.get('/api/usuarios', async (req, res) => {
 app.get('/api/usuario/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
-    
+
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
-    
+
     const usuario = await response.json();
-    
+
     res.json({
       success: true,
       data: usuario
     });
-    
+
   } catch (error) {
     console.error('Error:', error.message);
     res.status(500).json({
@@ -111,34 +111,88 @@ app.get('/api/posts', async (req, res) => {
   try {
     // Obtener parámetros de consulta (ej: /api/posts?userId=1)
     const { userId } = req.query;
-    
+
     let url = 'https://jsonplaceholder.typicode.com/posts';
-    
+
     // Si se proporciona userId, filtrar por ese usuario
     if (userId) {
       url += `?userId=${userId}`;
     }
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
-    
+
     const posts = await response.json();
-    
+
     res.json({
       success: true,
       total: posts.length,
       filtros: { userId: userId || 'ninguno' },
       data: posts
     });
-    
+
   } catch (error) {
     console.error('Error:', error.message);
     res.status(500).json({
       success: false,
       error: 'Error al obtener posts'
+    });
+  }
+});
+
+app.get('/api/meteorologia/:provincia', async (req, res) => {
+  try {
+    const { provincia } = req.params;
+    const API_KEY = process.env.AEMET_API_KEY;
+
+    // 1. Primera petición para obtener la URL de los datos
+    const response = await fetch(
+      `https://opendata.aemet.es/opendata/api/prediccion/provincia/hoy/${provincia}?api_key=${API_KEY}`
+    );
+
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+    const data = await response.json();
+
+    // 2. Segunda petición a la URL que nos da AEMET
+    if (data.datos) {
+      const datosResponse = await fetch(data.datos);
+
+      const arrayBuffer = await datosResponse.arrayBuffer();
+      const decoder = new TextDecoder('iso-8859-15');
+      const text = decoder.decode(arrayBuffer);
+
+      let resultado;
+
+      try {
+        // Intentamos convertir a JSON
+        resultado = JSON.parse(text);
+      } catch (e) {
+        // Si falla, es que AEMET nos ha dado el informe en texto plano
+        console.log('AEMET devolvió texto plano, no JSON');
+        resultado = {
+          formato: 'texto_plano',
+          contenido: text // Aquí irá el texto de "AGENCIA ESTATAL..."
+        };
+      }
+
+      res.json({
+        success: true,
+        data: resultado
+      });
+
+    } else {
+      res.json(data);
+    }
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener datos meteorológicos'
     });
   }
 });
