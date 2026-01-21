@@ -3,6 +3,8 @@ import NavBar from './components/NavBar'
 import Cookies from 'universal-cookie';
 import './App.css'
 import ConsultaMeteo from './components/ConsultaMeteo';
+import SelectorProvincia from './components/Selector';
+import provincias from './data/provincias.json'
 
 const cookies = new Cookies();
 
@@ -25,8 +27,11 @@ function App() {
   return (
     <div className={`min-h-screen ${isDark ? 'bg-[#1e2939c2]' : 'bg-white'} transition-colors duration-500`}>
       <NavBar isDark={isDark} toggleDark={() => setIsDark(!isDark)} />
-      <main className="p-10 flex justify-center">
+      <main className="p-10 flex justify-center gap-3">
         <ConsultaMeteo isDark={isDark} />
+        <div>
+          <SelectorProvincia provincias />
+        </div>
       </main>
     </div>
   )
