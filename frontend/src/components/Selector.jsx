@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, ComboboxButton } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline'
 
-export default function Selector(coleccion = [], onSelect, placeholder = "Seleccionar...") {
-
-    const [selectedobjeto, setSelectedobjeto] = useState(null)
+export default function Selector(props) {
+    const { coleccion, onSelect, placeholder } = props;
+    const [selectedObjeto, setSelectedObjeto] = useState(null)
     const [query, setQuery] = useState('')
 
-    const filteredobjeto =
+    const filteredObjeto =
         query === ''
             ? coleccion
             : coleccion.filter((objeto) => {
@@ -15,13 +15,19 @@ export default function Selector(coleccion = [], onSelect, placeholder = "Selecc
             })
 
     return (
-        <Combobox value={selectedobjeto} onChange={setSelectedobjeto} onClose={() => setQuery('')}>
+        <Combobox 
+            value={selectedObjeto} 
+            onChange={(valor) => {
+                setSelectedObjeto(valor); 
+                onSelect(valor);
+            }}
+            onClose={() => setQuery('')}>
             <div className="relative w-full max-w-sm">
             <ComboboxInput
                 className="w-full bg-white border-2 border-gray-200 rounded-full py-2 px-4 text-center focus:outline-none focus:border-blue-500 transition-colors"
                 aria-label="coleccion"
                 displayValue={(objeto) => objeto?.nombre}
-                placeholder='coleccion'
+                placeholder={placeholder}
                 onChange={(event) => setQuery(event.target.value)}
             />
             <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
