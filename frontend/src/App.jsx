@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react'
 import NavBar from './components/NavBar'
+import Cookies from 'universal-cookie';
 import './App.css'
 
-function App() {
-  const [isDark, setIsDark] = useState(false);
+const cookies = new Cookies();
 
+function App() {
+  const [isDark, setIsDark] = useState(() => {
+    const modeCookie = cookies.get('darkMode');
+    return modeCookie;
+  });
+  
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
+      cookies.set('darkMode', true, {path: '/', maxAge: 31536000, secure: true, sameSite: 'lax'});
     } else {
       document.documentElement.classList.remove('dark');
+      cookies.set('darkMode', false, {path: '/', maxAge: 31536000, secure: true, sameSite: 'lax'});
     }
 
   }, [isDark]);
