@@ -16,7 +16,7 @@ export default function ConsultaMeteo({ isDark, idProvincia }) {
                 const partes = texto.split(/TEMPERATURAS MÍNIMAS/i);
                 const cabeceraYDesc = partes[0].split(/\n/);
                 const nombreProvincia = cabeceraYDesc[5].trim();
-                console.log(nombreProvincia);
+                console.log(cabeceraYDesc);
                 let descripcion = cabeceraYDesc.slice(6, cabeceraYDesc.length).join(' ');
                 descripcion = descripcion.replace('.', '.\n');
                 const regexTemps = /^([a-zA-ZáéíóúÁÉÍÓÚñÑ\/ ]+?)\s+(-?\d+)\s+(-?\d+)\s*$/gm;
