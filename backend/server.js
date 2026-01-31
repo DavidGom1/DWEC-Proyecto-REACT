@@ -161,7 +161,7 @@ app.get('/api/municipios/:provincia', async (req, res) => {
   }
 });
 
-app.get('/api/meteorologia/:provincia', async (req, res) => {
+app.get('/api/meteorologia/provincia/:provincia', async (req, res) => {
   try {
     const { provincia } = req.params;
     const API_KEY = process.env.AEMET_API_KEY;
@@ -169,6 +169,60 @@ app.get('/api/meteorologia/:provincia', async (req, res) => {
     // 1. Primera petición para obtener la URL de los datos
     const response = await fetch(
       `https://opendata.aemet.es/opendata/api/prediccion/provincia/hoy/${provincia}?api_key=${API_KEY}`
+    );
+
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+    const data = await response.json();
+
+    // 2. Segunda petición a la URL que nos da AEMET
+    if (data.datos) {
+      const datosResponse = await fetch(data.datos);
+
+      const arrayBuffer = await datosResponse.arrayBuffer();
+      const decoder = new TextDecoder('iso-8859-15');
+      const text = decoder.decode(arrayBuffer);
+
+      let resultado;
+
+      try {
+        // Intentamos convertir a JSON
+        resultado = JSON.parse(text);
+      } catch (e) {
+        // Si falla, es que AEMET nos ha dado el informe en texto plano
+        console.log('AEMET devolvió texto plano, no JSON');
+        resultado = {
+          formato: 'texto_plano',
+          contenido: text // Aquí irá el texto de "AGENCIA ESTATAL..."
+        };
+      }
+
+      res.json({
+        success: true,
+        data: resultado
+      });
+
+    } else {
+      res.json(data);
+    }
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener datos meteorológicos'
+    });
+  }
+});
+
+app.get('/api/meteorologia/municipio/:municipio', async (req, res) => {
+  try {
+    const { municipio } = req.params;
+    const API_KEY = process.env.AEMET_API_KEY;
+
+    // 1. Primera petición para obtener la URL de los datos
+    const response = await fetch(
+      `https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/diaria/${municipio}?api_key=${API_KEY}`
     );
 
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);

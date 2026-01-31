@@ -30,24 +30,18 @@ function App() {
   useEffect(() => {
     fetch('/api/provincias')
       .then(res => res.json())
-      .then(data => {
-        setProvincias(data);
-      })
-      .catch(err => {
-        console.error("Error: ", err);
-      });
+      .then(data => setProvincias(data))
+      .catch(err => console.error("Error: ", err));
   }, []);
 
   useEffect(() => {
     if(provinciaSeleccionada!=null){
+      setMunicipios([]);
+      setMunicipioSeleccionado(null);
       fetch(`/api/municipios/${provinciaSeleccionada.id}`)
         .then(res => res.json())
-        .then(data => {
-          setMunicipios(data);
-        })
-        .catch(err => {
-          console.error('Error: ', err);
-        })
+        .then(data => setMunicipios(data))
+        .catch(err => console.error('Error: ', err));
       }
   }, [provinciaSeleccionada]);
 
@@ -55,18 +49,22 @@ function App() {
     <div className={`min-h-screen ${isDark ? 'bg-[#1e2939c2]' : 'bg-white'} transition-colors duration-500`}>
       <NavBar isDark={isDark} toggleDark={() => setIsDark(!isDark)} />
       <main className="p-10 flex flex-col items-center gap-3">
-        <div className="pb-5 flex justify-evenly gap-4 max-w-[500px]">
+        <div className="pb-5 flex flex-wrap justify-evenly gap-4 max-w-[500px]">
           <SelectorProvincia 
-            label="Provincia"
+            id="selectorMunicipio"
+            label="Provincia hoy"
             coleccion={provincias} 
+            valueSelected={provinciaSeleccionada}
             onSelect={(prov) => setProvinciaSeleccionada(prov)}
-            placeholder="Seleccionar provincia"
+            placeholder="Buscar provincia"
             isDark={isDark} />
           <SelectorProvincia 
-            label="Municipio"
+            id="selectorMunicipio"
+            label="Municipio 7 dias"
             coleccion={municipios}
+            valueSelected={municipioSeleccionado}
             onSelect={(mun) => setMunicipioSeleccionado(mun)}
-            placeholder={provinciaSeleccionada ? "Seleccionar municipio" : "Provincia primero"}
+            placeholder={provinciaSeleccionada ? "Buscar municipio" : "Provincia primero"}
             isDark={isDark} />
         </div>
         <div>
