@@ -31,6 +31,8 @@ export default function ConsultaMeteo({ isDark, idProvincia, idMunicipio }) {
                     const cabeceraYDesc = partes[0].split(/\n/);
                     const nombreProvincia = cabeceraYDesc[5].trim();
                     let descripcion = cabeceraYDesc.slice(6, cabeceraYDesc.length).join(' ');
+                    console.log(descripcion)
+                    if(descripcion==".  ") descripcion = 'No hay descripción en texto para esta provincia.'
                     descripcion = descripcion.replace('.', '.\n');
                     const regexTemps = /^([a-zA-ZáéíóúÁÉÍÓÚñÑ\/ ]+?)\s+(-?\d+)\s+(-?\d+)\s*$/gm;
                     let temps = [];
@@ -51,19 +53,19 @@ export default function ConsultaMeteo({ isDark, idProvincia, idMunicipio }) {
 
 
     return (
-        <div className={`rounded-[20px] w-2xl overflow-hidden shadow-lg border ${
+        <div className={`rounded-[20px] w-full lg:w-4xl md:w-2xl overflow-hidden shadow-lg border ${
             isDark ? 'bg-[#2d2d2d] border-[#1d1d1d] text-gray-200' : 'bg-white border-gray-200 text-gray-800'
         }`}>
             <div className="p-5 border-b border-gray-500/20">
-                <h3 className="text-xl uppercase tracking-widest font-bold opacity-50 mb-2">{loading ? 'cargando...' : !idProvincia ? 'Selecciona una provincia para comenzar' : !idMunicipio ? 'Predicción para' : 'Predicción diaria'} {datos?.nombreProvincia}</h3>
+                <h3 className="text-xl uppercase tracking-widest font-bold opacity-50 mb-2">{loading ? 'cargando...' : !idProvincia ? 'Selecciona una provincia para comenzar' : !idMunicipio ? 'Predicción para' : 'Predicción diaria'} {loading ? '' : datos?.nombreProvincia}</h3>
                 <p className="text-lg leading-relaxed font-medium whitespace-pre-line">
-                    {datos?.descripcion}
+                    {loading ? '' : datos?.descripcion}
                 </p>
             </div>
             <div className="p-5 bg-black/5">
                 <h3 className="text-xs uppercase tracking-widest font-bold opacity-50 mb-4">{loading ? '' : !idProvincia ? 'Luego podrás escoger un municipio de la provincia si necesitas su predicción.' : !idMunicipio ? 'Temperaturas municipios principales' : 'Diaria'}</h3>
                 <div className="grid grid-cols-1 gap-3">
-                    {datos?.temps.map((t, i) => (
+                    {loading ? '' : datos?.temps.map((t, i) => (
                         <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/10">
                             <span className="font-semibold">{t.municipio?t.municipio:t.dia}</span>
                             <div className="flex gap-4">
