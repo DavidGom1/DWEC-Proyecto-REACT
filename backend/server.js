@@ -3,6 +3,10 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Archivos a cargar
+const provincias = require('./data/provincias.json');
+const municipios = require('./data/municipios.json');
+
 // Crear aplicación Express
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -140,6 +144,20 @@ app.get('/api/posts', async (req, res) => {
       success: false,
       error: 'Error al obtener posts'
     });
+  }
+});
+
+app.get('/api/provincias', async(req, res) => {
+  res.json(provincias);
+});
+
+app.get('/api/municipios/:provincia', async (req, res) => {
+  try{
+    const { provincia } = req.params;
+    let municipios_filtrados = municipios.filter(mun => mun.cod_provincia == provincia )
+    res.json(municipios_filtrados[0].municipios);
+  } catch (error) {
+    console.error('Error: ', error);
   }
 });
 
