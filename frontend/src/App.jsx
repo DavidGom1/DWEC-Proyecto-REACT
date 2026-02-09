@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie';
 import './App.css'
 import ConsultaMeteo from './components/consulta-meteo/ConsultaMeteo';
 import SelectorProvincia from './components/selector/Selector';
+export const API_URL = import.meta.env.VITE_API_URL
 
 const cookies = new Cookies();
 
@@ -28,7 +29,7 @@ function App() {
   }, [isDark]);
 
   useEffect(() => {
-    fetch('/api/provincias')
+    fetch(`${API_URL}/api/provincias`)
       .then(res => res.json())
       .then(data => setProvincias(data))
       .catch(err => console.error("Error: ", err));
@@ -38,7 +39,7 @@ function App() {
     if(provinciaSeleccionada!=null){
       setMunicipios([]);
       setMunicipioSeleccionado(null);
-      fetch(`/api/municipios/${provinciaSeleccionada.id}`)
+      fetch(`${API_URL}/api/municipios/${provinciaSeleccionada.id}`)
         .then(res => res.json())
         .then(data => setMunicipios(data))
         .catch(err => console.error('Error: ', err));

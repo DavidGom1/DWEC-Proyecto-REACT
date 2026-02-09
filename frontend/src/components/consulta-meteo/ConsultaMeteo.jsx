@@ -10,7 +10,7 @@ export default function ConsultaMeteo({ isDark, idProvincia, idMunicipio }) {
             setLoading(true);
             try {
                 if (idMunicipio != null) {
-                    const respuesta = await fetch(`/api/meteorologia/municipio/${idMunicipio}`);
+                    const respuesta = await fetch(`${API_URL}/api/meteorologia/municipio/${idMunicipio}`);
                     if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
                     const json = await respuesta.json();
                     if (!json.success || !json.data) {
@@ -30,7 +30,7 @@ export default function ConsultaMeteo({ isDark, idProvincia, idMunicipio }) {
                     });
                     setDatos({ nombreProvincia, descripcion, temps })
                 } else {
-                    const respuesta = await fetch(`/api/meteorologia/provincia/${idProvincia}`);
+                    const respuesta = await fetch(`${API_URL}/api/meteorologia/provincia/${idProvincia}`);
                     if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
                     const json = await respuesta.json();
                     if (!json.success || !json.data) {
