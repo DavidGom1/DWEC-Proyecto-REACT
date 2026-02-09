@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const API_KEY = process.env.AEMET_API_KEY;
+
 // Archivos a cargar
 const provincias = require('./data/provincias.json');
 const municipios = require('./data/municipios.json');
@@ -27,14 +29,14 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/api/provincias', async(req, res) => {
+app.get('/api/provincias', async (req, res) => {
   res.json(provincias);
 });
 
 app.get('/api/municipios/:provincia', async (req, res) => {
-  try{
+  try {
     const { provincia } = req.params;
-    let municipios_filtrados = municipios.filter(mun => mun.cod_provincia == provincia )
+    let municipios_filtrados = municipios.filter(mun => mun.cod_provincia == provincia)
     res.json(municipios_filtrados[0].municipios);
   } catch (error) {
     console.error('Error: ', error);
@@ -44,8 +46,9 @@ app.get('/api/municipios/:provincia', async (req, res) => {
 app.get('/api/meteorologia/provincia/:provincia', async (req, res) => {
   try {
     const { provincia } = req.params;
-    const API_KEY = process.env.AEMET_API_KEY;
-
+    if (!API_KEY) {
+      return res.status(500).json({ success: false, error: 'Falta configurar la API KEY' });
+    }
     const response = await fetch(
       `https://opendata.aemet.es/opendata/api/prediccion/provincia/hoy/${provincia}?api_key=${API_KEY}`
     );
@@ -95,8 +98,9 @@ app.get('/api/meteorologia/provincia/:provincia', async (req, res) => {
 app.get('/api/meteorologia/municipio/:municipio', async (req, res) => {
   try {
     const { municipio } = req.params;
-    const API_KEY = process.env.AEMET_API_KEY;
-
+    if (!API_KEY) {
+      return res.status(500).json({ success: false, error: 'Falta configurar la API KEY' });
+    }
     const response = await fetch(
       `https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/diaria/${municipio}?api_key=${API_KEY}`
     );
@@ -116,7 +120,6 @@ app.get('/api/meteorologia/municipio/:municipio', async (req, res) => {
       try {
         resultado = JSON.parse(text);
       } catch (e) {
-        console.log('AEMET devolvió texto plano, no JSON');
         resultado = {
           formato: 'texto_plano',
           contenido: text
