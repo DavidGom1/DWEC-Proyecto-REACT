@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { API_URL } from '../../config';
 
 export default function ConsultaMeteo({ isDark, idProvincia, idMunicipio }) {
     const [datos, setDatos] = useState(null);

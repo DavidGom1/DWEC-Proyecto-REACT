@@ -49,6 +49,7 @@ app.get('/api/meteorologia/provincia/:provincia', async (req, res) => {
     if (!API_KEY) {
       return res.status(500).json({ success: false, error: 'Falta configurar la API KEY' });
     }
+    console.log(API_KEY);
     const response = await fetch(
       `https://opendata.aemet.es/opendata/api/prediccion/provincia/hoy/${provincia}?api_key=${API_KEY}`
     );
